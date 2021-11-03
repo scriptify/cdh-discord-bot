@@ -12,6 +12,17 @@ const client = new Discord.Client({
   ],
 });
 
+const NEWBIE_MESSAGE = `
+Welcome to the Hipsters! Grab a coffee and check:
+
+<#897143953613279252>
+<#905465109965574175>
+<#897143870566055966>
+<#902887724850249788>
+
+If you got any questions don't bother to ask us!
+`;
+
 function main() {
   client.on("ready", () => {
     console.log(`Discord Bot started and waiting for commands!`);
@@ -40,6 +51,10 @@ function main() {
       for (const link of linksToPost) {
         msg.reply(link);
       }
+    }
+
+    if (msg.content === "!new") {
+      msg.reply(NEWBIE_MESSAGE);
     }
   });
 
