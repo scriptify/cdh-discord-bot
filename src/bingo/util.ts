@@ -51,11 +51,15 @@ export async function saveBingoRound(msg: Discord.Message) {
 }
 
 export async function retrieveBingoRound() {
-  const content = JSON.parse(
-    (await fs.promises.readFile(BINGO_ROUND_FILE)).toString()
-  );
+  try {
+    const content = JSON.parse(
+      (await fs.promises.readFile(BINGO_ROUND_FILE)).toString()
+    );
 
-  return content as BingoRound;
+    return content as BingoRound;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export async function deleteBingoRound() {
