@@ -12,6 +12,8 @@ import {
 
 const INIT_CMD = "!bingo_init";
 const STOP_CMD = "!bingo_stop";
+const INFO_CMD = "!bingo_info";
+const WIN_CMD = "!bingo_win";
 const JOIN_CMD = "!bingo";
 
 let currentRound: BingoRound | undefined;
@@ -48,6 +50,24 @@ export const bingoCommand: DiscordBotCommand = async (msg) => {
     `);
   }
 
+  if (msg.content === INFO_CMD) {
+    if (!isSenderAdmin(msg)) return;
+    const winningFields = currentRound?.fields.filter(
+      (field) => field.isWinning
+    );
+    const allUsedIds = linksUsed.map((link) => link.fieldId);
+    const winningLinksInUse = winningFields?.filter((field) =>
+      allUsedIds.includes(field.id)
+    );
+    const numWinningLinks = `${winningLinksInUse?.length}/${winningFields?.length}`;
+    const numLinksUsed = `${linksUsed.length}/${currentRound?.fields.length}`;
+    msg.author.send(`
+❓❓ Current Game Info:
+🌐 Links in use: ${numLinksUsed}
+🏆 Winning Links in use: ${numWinningLinks}
+    `);
+  }
+
   if (msg.content === JOIN_CMD) {
     if (!currentRound) {
       msg.reply(`
@@ -56,17 +76,26 @@ export const bingoCommand: DiscordBotCommand = async (msg) => {
       return;
     }
 
-    const didAlreadyJoin = !!linksUsed.find(
+    const didAlreadyJoin = linksUsed.find(
       (link) => link.userId === msg.author.id
     );
     if (didAlreadyJoin) {
-      msg.reply(`
+      const field = currentRound?.fields.find(
+        (field) => field.id === didAlreadyJoin.fieldId
+      );
+      msg.author.send(`
 ☝ You already joined the current Bingo Round!
+${field?.url}
       `);
       return;
     }
 
     const field = retrieveJoinUrl(msg, linksUsed, currentRound);
+    if (!field) {
+      msg.reply(`
+😢 Sorry, there are no more join links available.
+      `);
+    }
     await setFieldUsed(field.id, msg.author.id, linksUsed);
     msg.author.send(`
 🎲 Welcome to Hipster Bingo!
@@ -78,5 +107,22 @@ ${field.url}
     msg.channel.send(
       `⏩⏩ **${msg.author.username}** just joined Hipster Bingo!`
     );
+  }
+
+  if (msg.content === WIN_CMD) {
+    const playerLink = linksUsed.find((link) => link.userId === msg.author.id);
+    const winningUserField = currentRound?.fields.find(
+      (field) => playerLink?.fieldId === field.id && field.isWinning
+    );
+    if (!winningUserField) {
+      msg.reply(`‼ Big NO NO! You did not win the game.`);
+    } else {
+      msg.reply(`
+✅🍀🌠 WE HAVE A WINNER 🌠🍀✅      
+Congratulations to **${msg.author.username}**
+
+**${msg.author.username}, prove it with a screenshot by answering this message!**
+`);
+    }
   }
 };
