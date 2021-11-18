@@ -1,5 +1,6 @@
-const Discord = require("discord.js");
-const dotenv = require("dotenv");
+import Discord from "discord.js";
+import dotenv from "dotenv";
+import { bingoCommand } from "./bingo";
 
 const NUM_HIPSTERS = 10000;
 
@@ -29,6 +30,8 @@ function main() {
   });
 
   client.on("messageCreate", (msg) => {
+    bingoCommand(msg);
+
     if (msg.content.includes("#")) {
       const allOccurrences = [
         ...msg.content.matchAll(new RegExp(/#[0-9]\d*\b/, "gi")),
