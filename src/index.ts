@@ -31,8 +31,8 @@ function main() {
 
   client.on("messageCreate", (msg) => {
     bingoCommand(msg);
-    console.log("REMOVE MEEEEEEEEEEEEEEEE!");
-    return;
+    // console.log("REMOVE MEEEEEEEEEEEEEEEE!");
+    // return;
 
     if (msg.content.includes("#")) {
       const allOccurrences = [
