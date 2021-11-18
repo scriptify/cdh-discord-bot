@@ -83,7 +83,7 @@ export const bingoCommand: DiscordBotCommand = async (msg) => {
       const field = currentRound?.fields.find(
         (field) => field.id === didAlreadyJoin.fieldId
       );
-      msg.author.send(`
+      msg.reply(`
 ☝ You already joined the current Bingo Round!
 ${field?.url}
       `);
@@ -97,16 +97,13 @@ ${field?.url}
       `);
     }
     await setFieldUsed(field.id, msg.author.id, linksUsed);
-    msg.author.send(`
+    msg.reply(`
 🎲 Welcome to Hipster Bingo!
 🌎 Join with your unique URL:
 ${field.url}
 
 🍀 May the luck be with you. 🍀
     `);
-    msg.channel.send(
-      `⏩⏩ **${msg.author.username}** just joined Hipster Bingo!`
-    );
   }
 
   if (msg.content === WIN_CMD) {
