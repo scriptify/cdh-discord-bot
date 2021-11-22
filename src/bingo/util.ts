@@ -14,6 +14,7 @@ export type UsedLink = {
 };
 
 export type BingoRound = {
+  state: "idle" | "started";
   fields: BingoLink[];
 };
 
@@ -47,7 +48,12 @@ export async function saveBingoRound(msg: Discord.Message) {
   }
 
   await fs.promises.writeFile(BINGO_ROUND_FILE, fileContents);
-  return JSON.parse(fileContents) as BingoRound;
+  const round = JSON.parse(fileContents);
+
+  return {
+    ...round,
+    state: "idle",
+  } as BingoRound;
 }
 
 export async function retrieveBingoRound() {

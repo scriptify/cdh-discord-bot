@@ -11,7 +11,7 @@ import {
 } from "./util";
 
 const INIT_CMD = "!bingo_init";
-const STOP_CMD = "!bingo_stop";
+const START_CMD = "!bingo_start";
 const INFO_CMD = "!bingo_info";
 const WIN_CMD = "!bingo_win";
 const JOIN_CMD = "!bingo";
@@ -39,14 +39,19 @@ export const bingoCommand: DiscordBotCommand = async (msg) => {
     `);
   }
 
-  if (msg.content === STOP_CMD) {
+  if (msg.content === START_CMD) {
     if (!isSenderAdmin(msg)) return;
-    currentRound = undefined;
-    linksUsed = [];
-    await deleteBingoRound();
+    if (!currentRound) {
+      msg.reply(`You need to initialize a game first.`);
+      return;
+    }
+    currentRound = {
+      ...currentRound,
+      state: "started",
+    };
     msg.reply(`
-🦜🏴‍☠️ Uuggh.
-🍀 The bingo round has been cleared. 🍀
+🦜🏴‍☠️ Aiight.
+🍀 The bingo round has been **started**. Users can now type !bingo_win 🍀
     `);
   }
 
@@ -107,6 +112,12 @@ ${field.url}
   }
 
   if (msg.content === WIN_CMD) {
+    if (!currentRound || currentRound.state !== "started") {
+      msg.reply(`
+        🛑 The game did not start yet.
+      `);
+      return;
+    }
     const playerLink = linksUsed.find((link) => link.userId === msg.author.id);
     const winningUserField = currentRound?.fields.find(
       (field) => playerLink?.fieldId === field.id && field.isWinning
