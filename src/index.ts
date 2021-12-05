@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import dotenv from "dotenv";
 import { bingoCommand } from "./bingo";
+import { pruneCommand } from "./prune";
 
 const NUM_HIPSTERS = 10000;
 
@@ -10,6 +11,8 @@ const client = new Discord.Client({
     Discord.Intents.FLAGS.GUILDS,
     Discord.Intents.FLAGS.GUILD_MESSAGES,
     Discord.Intents.FLAGS.DIRECT_MESSAGES,
+    Discord.Intents.FLAGS.GUILD_MEMBERS,
+    Discord.Intents.FLAGS.GUILD_BANS,
   ],
 });
 
@@ -29,8 +32,9 @@ function main() {
     console.log(`Discord Bot started and waiting for commands!`);
   });
 
-  client.on("messageCreate", (msg) => {
-    bingoCommand(msg);
+  client.on("messageCreate", async (msg) => {
+    await pruneCommand(msg);
+    await bingoCommand(msg);
 
     if (msg.content.includes("#")) {
       const allOccurrences = [
