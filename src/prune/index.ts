@@ -16,7 +16,11 @@ async function getMembersToPrune(msg: Discord.Message) {
   msg.reply(`
     🦵 The following members will be pruned (${membersToPrune.size}):
 
-    ${membersToPrune.map((member) => member.displayName).join("\n")}
+    ${membersToPrune
+      .map((member) => member.displayName)
+      .slice(0, 20)
+      .join("\n")}
+    ${membersToPrune.size > 20 ? "\n..." : ""}
   `);
 
   return membersToPrune;
